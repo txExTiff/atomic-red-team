@@ -38,3 +38,22 @@ atomic_tests:
     command: |
       /usr/libexec/PlistBuddy -c "print :CFBundleShortVersionString" /Applications/Safari.app/Contents/Info.plist
       /usr/libexec/PlistBuddy -c "print :CFBundleVersion" /Applications/Safari.app/Contents/Info.plist
+- name: List opened files by user
+  auto_generated_guid: 7e46c7a5-0142-45be-a858-1a3ecb4fd3cb
+  description: |
+    List opened files by user
+  supported_platforms:
+  - linux
+  - macos
+  executor:
+    command: |
+      username=$(id -u -n) && lsof -u $username
+    name: sh
+  dependency_executor_name: sh
+  dependencies:
+  - description: |
+      check if lsof exists
+    prereq_command: |
+      which lsof
+    get_prereq_command: |
+      (which yum && yum -y install lsof)||(which apt-get && DEBIAN_FRONTEND=noninteractive apt-get install -y lsof)
